@@ -3,15 +3,28 @@ package com;
 import com.birdbrain.Finch;
 
 public class Main {
+    static Finch lineTracker = new Finch("A");
+    static int whiteLine;
+
+    public static void calibration() throws InterruptedException {
+        while (!lineTracker.getButton("B")) {
+            whiteLine = (lineTracker.getLine("R") + lineTracker.getLine("L")) / 2 - 10;
+        }
+        System.out.println("White line color: " + whiteLine);
+    }
+
     public static void main(String[] args) throws InterruptedException {
-        Finch myFinch = new Finch("A");
-        int whiteLine = 80;
 
         int ind = 0;
+        lineTracker.setMotors(0, 0);
 
-        while (!myFinch.getButton("A")) {
-            int right = myFinch.getLine("R");
-            int left = myFinch.getLine("L");
+        calibration();
+        Thread.sleep(5000);
+
+        while (!lineTracker.getButton("A")) {
+
+            int right = lineTracker.getLine("R");
+            int left = lineTracker.getLine("L");
 
             System.out.println(ind);
             System.out.println("Правый датчик:" + right);
@@ -19,7 +32,7 @@ public class Main {
 
             if (right > whiteLine && left > whiteLine) {
                 // фул белый
-                myFinch.setMotors(10, 10);
+                lineTracker.setMotors(10, 10);
             } else if (right < whiteLine && left < whiteLine) {
                 System.out.println("[Фул чёрный]Правый датчик:" + right);
                 System.out.println("[Фул чёрный]Левый датчик:" + left);
@@ -32,26 +45,26 @@ public class Main {
 //                    myFinch.setTurn("L",90,20);
 
                 if (ind == 0) {
-                    myFinch.setMotors(0, 0);
-                    myFinch.setTurn("R", 45, 100);
-                    myFinch.setMotors(0, 0);
+                    lineTracker.setMotors(0, 0);
+                    lineTracker.setTurn("R", 45, 100);
+                    lineTracker.setMotors(0, 0);
 
-                    System.out.println(myFinch.getDistance());
+                    System.out.println(lineTracker.getDistance());
 
-                    while (myFinch.getDistance() < 100) {
+                    while (lineTracker.getDistance() < 100) {
                         // можно добавить сигнал, что он пропускает
                         Thread.sleep(999);
                     }
 
 
-                    myFinch.setTurn("L", 45, 100);
+                    lineTracker.setTurn("L", 45, 100);
 
-                    while (myFinch.getDistance() < 40) {
+                    while (lineTracker.getDistance() < 40) {
                         // можно добавить сигнал, что он пропускает
                         Thread.sleep(999);
                     }
 
-                    myFinch.setMotors(10,10);
+                    lineTracker.setMotors(10,10);
                     Thread.sleep(999);
 //                    ind++;
 
@@ -65,12 +78,12 @@ public class Main {
 
             } else if (left < whiteLine) {
                 // левый чёрный
-                myFinch.setMotors(0, 5);
+                lineTracker.setMotors(0, 5);
             } else if (right < whiteLine){
                 // правый чёрный
-                myFinch.setMotors(5, 0);
+                lineTracker.setMotors(5, 0);
             }
         }
-        myFinch.stop();
+        lineTracker.stop();
     }
 }
